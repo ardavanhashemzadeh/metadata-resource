@@ -1,15 +1,21 @@
 #!/bin/bash
 #/ardy/hash
 
+standard_input=$(cat /dev/stdin)
+
 # Perform different operations based what the filename of this script is:
 case $(basename $0) in
   check)
-    echo "[]"
+    echo '[ { "ref": "'$(date +'%m%d%Y%H%M%S')'" }]'
     ;;
   in|out)
-    set -e
-    [[ "${1}" == '' ]]
+    VERSION_REF=$(echo $standard_input | jq -r '.version.ref')
     env | grep -e 'BUILD_' -e ATC_EXTERNAL_URL > ${1}/build.env
+    jq -Rn ' [inputs | split("\n") [] | select(length > 0) | split("=") | {name: .[0], value: .[1]}]' ${1}/build.env > ${1}/build.env.json
+    jq -n \
+        --arg version_ref $VERSION_REF \
+        --argjson metadata "$(cat ${1}/build.env.json)" \
+        '{version: {ref: $version_ref}, metadata: $metadata}'
     ;;
   *)
     exit 1
