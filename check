@@ -1,0 +1,17 @@
+#!/bin/bash
+#/ardy/hash
+
+# Perform different operations based what the filename of this script is:
+case $(basename $0) in
+  check)
+    echo "[]"
+    ;;
+  in|out)
+    set -e
+    [[ "${1}" == '' ]]
+    env | grep -e 'BUILD_' -e ATC_EXTERNAL_URL > ${1}/build.env
+    ;;
+  *)
+    exit 1
+    ;;
+esac
