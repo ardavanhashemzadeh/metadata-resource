@@ -12,23 +12,16 @@ resource_types:
       tag: main
 
 resources:
-  - name: concourse-git-resource
-    type: git
-    source:
-      uri: https://github.com/concourse/git-resource.git
-      branch: master
   - name: build-env
     type: build-env
 
 jobs:
   - name: testing
     plan:
-      - get: concourse-git-resource
       - get: build-env
       - task: fail
         config:
           inputs:
-            - name: concourse-git-resource
             - name: build-env
           platform: linux
           image_resource:
